@@ -11,7 +11,7 @@ void fillBuffer(AudioBuffer* buf, Sine* s) {
         std::vector<float> v(2);
         v[0] = s->tick();
         v[1] = v[0];
-        buf->put(v);
+        buf->write((const float*) v.data(), 2);
     }
     if (buf->full()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

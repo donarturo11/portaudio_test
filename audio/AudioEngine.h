@@ -9,7 +9,7 @@
 #define STREAM_OUTPUT 1
 #define STREAM_INPUT 2
 #define STREAM_DUPLEX (STREAM_OUTPUT | STREAM_INPUT)
-using AudioBuffer = Buffer<std::vector<float>>;
+using AudioBuffer = Buffer<float>;
 class AudioEngine
 {
 public:
@@ -88,6 +88,7 @@ private:
         _output->resize(_nFrames * _nChannels * _nPeriods);
     }
 protected:
+    const bool _interleaved;
     portaudio::AutoSystem autoSys;
     portaudio::System *_sys;
     portaudio::MemFunCallbackStream<AudioEngine> _stream;
