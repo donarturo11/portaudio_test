@@ -8,10 +8,10 @@
 static bool running = false;
 void fillBuffer(AudioBuffer* buf, Sine* s) {
     while (!(buf->full())) {
-        std::vector<float> v(2);
+        float v[2];
         v[0] = s->tick();
         v[1] = v[0];
-        buf->write((const float*) v.data(), 2);
+        buf->write((const float*) v, 2);
     }
     if (buf->full()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -24,7 +24,9 @@ void fillBuffer(AudioBuffer* buf, Sine* s) {
 int main(int argc,  char **argv)
 {
     AudioEngine audio(2, 4096, 4, STREAM_OUTPUT);
+    
     audio.setupDefaultStreamParameters();
+    
     float freq;
     Sine s;
     s.setup(440, 44100, 0.9);
@@ -36,7 +38,11 @@ int main(int argc,  char **argv)
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     audio.startStream();
+    std::cout << std::endl
+              << "Type desired frequency to change in range freq > 0 " << std::endl 
+              << "or any key to quit then press ENTER" << std::endl;
     while (running) {
+        std::cout << "> ";
         std::cin >> freq;
         s.setup(freq, 44100, 0.9);
         if (freq<=0) {
