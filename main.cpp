@@ -1,6 +1,10 @@
 #include "AudioEngine.h"
 #include "Sine.h"
+#ifdef USE_PORTAUDIOCPP
 #include "portaudiocpp/PortAudioCpp.hxx"
+#else
+#include "portaudio.h"
+#endif
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -25,11 +29,13 @@ int main(int argc,  char **argv)
 {
     AudioEngine audio(2, 4096, 4, STREAM_OUTPUT);
     
+    audio.setupHostApi(paJACK);
     audio.setupDefaultStreamParameters();
-    
     float freq;
+    float sRate = audio.samplerate();
+    std::cout << "Sample rate: " << sRate << std::endl;
     Sine s;
-    s.setup(440, 44100, 0.9);
+    s.setup(440, sRate, 0.9);
     running = true;
     auto buf = audio.output();
     std::thread t(fillBuffer,buf, &s);
@@ -39,8 +45,10 @@ int main(int argc,  char **argv)
     }
     audio.startStream();
     std::cout << std::endl
+              << "===================================================" << std::endl
               << "Type desired frequency to change in range freq > 0 " << std::endl 
-              << "or any key to quit then press ENTER" << std::endl;
+              << "or any key to quit then press ENTER" << std::endl
+              << "===================================================" << std::endl;
     while (running) {
         std::cout << "> ";
         std::cin >> freq;
